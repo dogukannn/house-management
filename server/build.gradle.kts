@@ -1,7 +1,7 @@
 plugins {
     kotlin("jvm") version "1.9.23"
     kotlin("plugin.serialization") version "1.9.23"
-    id("io.ktor.plugin") version "2.3.8"
+    application
     id("com.github.johnrengelman.shadow") version "8.1.1"
 }
 
@@ -9,7 +9,7 @@ group = "com.dunettrpg.server"
 version = "0.1.0"
 
 application {
-    mainClass.set("com.dunettrpg.server.ApplicationKt")
+    mainClass.set("io.ktor.server.netty.EngineMain")
 }
 
 repositories {
@@ -35,7 +35,7 @@ dependencies {
     implementation("org.jetbrains.exposed:exposed-jdbc:0.46.0")
     implementation("org.jetbrains.exposed:exposed-kotlin-datetime:0.46.0")
     implementation("org.postgresql:postgresql:42.7.2")
-    implementation("com.zaxxer:HikariCP:5.1.0")
+    implementation("com.zaxxer:HikariCP:5.0.1")
     
     // Security
     implementation("org.mindrot:jbcrypt:0.4")
@@ -44,7 +44,12 @@ dependencies {
     implementation("ch.qos.logback:logback-classic:1.4.14")
     
     // Firebase Admin SDK
-    implementation("com.google.firebase:firebase-admin:9.2.0")
+    implementation("com.google.firebase:firebase-admin:9.2.0") {
+        exclude(group = "com.google.guava", module = "listenablefuture")
+    }
+    
+    // Force Guava version to resolve conflict
+    implementation("com.google.guava:guava:32.1.1-jre")
     
     // Coroutines
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3")
