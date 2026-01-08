@@ -40,6 +40,13 @@ class HouseRepository {
         getHouseById(id)
     }
     
+    fun updateEconomy(id: String, economyState: EconomyState): Boolean = transaction {
+        HousesTable.update({ HousesTable.id eq UUID.fromString(id) }) {
+            it[HousesTable.economyState] = Json.encodeToString(EconomyState.serializer(), economyState)
+            it[updatedAt] = Clock.System.now()
+        } > 0
+    }
+    
     fun createHouse(name: String, planetaryFief: String, economyState: EconomyState, politicalStanding: Int): House = transaction {
         val now = Clock.System.now()
         val id = HousesTable.insert {
