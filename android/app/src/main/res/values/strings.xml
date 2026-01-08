@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">Dune TTRPG</string>
+    <string name="login">Login</string>
+    <string name="username">Username</string>
+    <string name="password">Password</string>
+    <string name="logout">Logout</string>
+    <string name="dashboard">Dashboard</string>
+    <string name="house">House</string>
+    <string name="votes">Votes</string>
+    <string name="events">Events</string>
+</resources>

@@ -1,0 +1,29 @@
+# Gradle files
+.gradle/
+build/
+*/build/
+local.properties
+*.iml
+.idea/
+captures/
+.externalNativeBuild
+.cxx
+
+# Android
+*.apk
+*.ap_
+*.aab
+*.dex
+*.class
+bin/
+gen/
+out/
+
+# Local configuration
+google-services.json
+local.properties
+
+# Misc
+*.log
+*.swp
+.DS_Store
