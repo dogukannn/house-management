@@ -5,6 +5,7 @@ import com.dunettrpg.server.data.repository.HouseRepository
 import com.dunettrpg.server.data.repository.TradeRepository
 import com.dunettrpg.server.domain.model.TradeDeal
 import com.dunettrpg.server.domain.model.TradeOffering
+import com.dunettrpg.server.domain.model.TradeStatus
 import com.dunettrpg.server.domain.service.TradeService
 import com.dunettrpg.server.dto.response.ApiResponse
 import io.ktor.http.*
@@ -269,7 +270,7 @@ fun Route.tradeRoutes() {
                         )
                     )
                     
-                    val success = tradeRepository.updateStatus(id, com.dunettrpg.server.domain.model.TradeStatus.CANCELLED)
+                    val success = tradeRepository.updateStatus(id, TradeStatus.CANCELLED)
                     if (success) {
                         call.respond(
                             ApiResponse.success(

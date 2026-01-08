@@ -4,6 +4,7 @@ import com.dunettrpg.server.data.repository.EventRepository
 import com.dunettrpg.server.data.repository.VoteRepository
 import com.dunettrpg.server.domain.model.Decision
 import com.dunettrpg.server.domain.model.Vote
+import com.dunettrpg.server.domain.model.VoteStatus
 import com.dunettrpg.server.domain.model.VoteType
 import com.dunettrpg.server.domain.service.VoteService
 import com.dunettrpg.server.dto.response.ApiResponse
@@ -47,7 +48,7 @@ fun Route.voteRoutes() {
                 try {
                     val status = call.request.queryParameters["status"]
                     val votes = if (status != null) {
-                        voteRepository.getByStatus(com.dunettrpg.server.domain.model.VoteStatus.valueOf(status))
+                        voteRepository.getByStatus(VoteStatus.valueOf(status))
                     } else {
                         voteRepository.getAll()
                     }

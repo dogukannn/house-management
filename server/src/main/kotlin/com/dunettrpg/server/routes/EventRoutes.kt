@@ -49,7 +49,8 @@ fun Route.eventRoutes() {
             // Get unread events count (placeholder - requires tracking read status)
             get("/unread") {
                 try {
-                    // Placeholder implementation
+                    // TODO: Implement proper unread tracking with user-specific read status
+                    // Currently returns 0 as placeholder
                     call.respond(
                         ApiResponse.success(
                             data = mapOf("count" to 0),
@@ -71,7 +72,8 @@ fun Route.eventRoutes() {
             // Mark events as read (placeholder)
             post("/mark-read") {
                 try {
-                    // Placeholder implementation
+                    // TODO: Implement proper read status tracking with event IDs and user associations
+                    // Currently returns success without actually updating any data
                     call.respond(
                         ApiResponse.success(
                             data = mapOf("message" to "Events marked as read"),

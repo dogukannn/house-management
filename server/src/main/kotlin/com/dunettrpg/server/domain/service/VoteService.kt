@@ -4,6 +4,7 @@ import com.dunettrpg.server.data.repository.EventRepository
 import com.dunettrpg.server.data.repository.VoteRepository
 import com.dunettrpg.server.domain.model.*
 import kotlinx.datetime.Clock
+import kotlinx.datetime.Instant
 
 class VoteService(
     private val voteRepository: VoteRepository,
@@ -17,7 +18,7 @@ class VoteService(
         initiatorHouseId: String,
         requiredParticipants: List<String>,
         consensusRequired: Boolean,
-        deadline: kotlinx.datetime.Instant? = null,
+        deadline: Instant? = null,
         createdBy: String
     ): Vote? {
         val vote = voteRepository.create(
