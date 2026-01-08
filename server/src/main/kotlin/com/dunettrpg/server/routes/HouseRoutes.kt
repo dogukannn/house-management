@@ -25,7 +25,7 @@ data class UpdateHouseRequest(
 fun Route.houseRoutes() {
     val houseRepository = HouseRepository()
     
-    authenticate {
+    authenticate("auth-jwt") {
         route("/api/houses") {
             // Get all houses (summary)
             get {
