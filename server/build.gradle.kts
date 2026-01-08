@@ -34,7 +34,7 @@ dependencies {
     implementation("org.jetbrains.exposed:exposed-dao:0.46.0")
     implementation("org.jetbrains.exposed:exposed-jdbc:0.46.0")
     implementation("org.jetbrains.exposed:exposed-kotlin-datetime:0.46.0")
-    implementation("org.postgresql:postgresql:42.7.1")
+    implementation("org.postgresql:postgresql:42.7.2")
     implementation("com.zaxxer:HikariCP:5.1.0")
     
     // Security
