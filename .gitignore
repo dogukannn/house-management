@@ -1,0 +1,36 @@
+# Android
+android/.gradle/
+android/build/
+android/*/build/
+android/local.properties
+android/*.iml
+android/.idea/
+android/captures/
+android/.externalNativeBuild
+android/.cxx
+android/*.apk
+android/*.ap_
+android/*.aab
+android/app/google-services.json
+
+# Server
+server/.gradle/
+server/build/
+server/.idea/
+server/*.iml
+server/.env
+server/firebase-credentials.json
+
+# IDE
+.idea/
+*.iml
+*.iws
+*.ipr
+.vscode/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log

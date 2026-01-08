@@ -1,0 +1,21 @@
+# Gradle
+.gradle/
+build/
+*/build/
+
+# IntelliJ
+.idea/
+*.iml
+*.iws
+*.ipr
+out/
+
+# Environment
+.env
+firebase-credentials.json
+
+# Logs
+*.log
+
+# Misc
+.DS_Store
