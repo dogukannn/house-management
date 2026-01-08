@@ -1,6 +1,7 @@
 package com.dunettrpg.server.routes
 
 import com.dunettrpg.server.data.repository.CharacterRepository
+import com.dunettrpg.server.domain.model.Character
 import com.dunettrpg.server.domain.model.CharacterStats
 import com.dunettrpg.server.domain.model.CharacterStatus
 import com.dunettrpg.server.dto.response.ApiResponse
@@ -43,7 +44,7 @@ fun Route.characterRoutes() {
             get {
                 val houseId = call.parameters["houseId"] ?: return@get call.respond(
                     HttpStatusCode.BadRequest,
-                    ApiResponse.error(
+                    ApiResponse.error<Character>(
                         code = "INVALID_ID",
                         message = "House ID is required",
                         timestamp = Clock.System.now().toString()
@@ -67,7 +68,7 @@ fun Route.characterRoutes() {
                     } else {
                         call.respond(
                             HttpStatusCode.Forbidden,
-                            ApiResponse.error(
+                            ApiResponse.error<Character>(
                                 code = "FORBIDDEN",
                                 message = "You don't have permission to view these characters",
                                 timestamp = Clock.System.now().toString()
@@ -77,7 +78,7 @@ fun Route.characterRoutes() {
                 } catch (e: Exception) {
                     call.respond(
                         HttpStatusCode.InternalServerError,
-                        ApiResponse.error(
+                        ApiResponse.error<Character>(
                             code = "INTERNAL_ERROR",
                             message = "Failed to fetch characters: ${e.message}",
                             timestamp = Clock.System.now().toString()
@@ -90,7 +91,7 @@ fun Route.characterRoutes() {
             post {
                 val houseId = call.parameters["houseId"] ?: return@post call.respond(
                     HttpStatusCode.BadRequest,
-                    ApiResponse.error(
+                    ApiResponse.error<Character>(
                         code = "INVALID_ID",
                         message = "House ID is required",
                         timestamp = Clock.System.now().toString()
@@ -104,7 +105,7 @@ fun Route.characterRoutes() {
                 if (userRole != "ADMIN") {
                     return@post call.respond(
                         HttpStatusCode.Forbidden,
-                        ApiResponse.error(
+                        ApiResponse.error<Character>(
                             code = "FORBIDDEN",
                             message = "Only admins can create characters",
                             timestamp = Clock.System.now().toString()
@@ -134,7 +135,7 @@ fun Route.characterRoutes() {
                 } catch (e: Exception) {
                     call.respond(
                         HttpStatusCode.InternalServerError,
-                        ApiResponse.error(
+                        ApiResponse.error<Character>(
                             code = "INTERNAL_ERROR",
                             message = "Failed to create character: ${e.message}",
                             timestamp = Clock.System.now().toString()
@@ -149,7 +150,7 @@ fun Route.characterRoutes() {
             get {
                 val id = call.parameters["id"] ?: return@get call.respond(
                     HttpStatusCode.BadRequest,
-                    ApiResponse.error(
+                    ApiResponse.error<Character>(
                         code = "INVALID_ID",
                         message = "Character ID is required",
                         timestamp = Clock.System.now().toString()
@@ -174,7 +175,7 @@ fun Route.characterRoutes() {
                         } else {
                             call.respond(
                                 HttpStatusCode.Forbidden,
-                                ApiResponse.error(
+                                ApiResponse.error<Character>(
                                     code = "FORBIDDEN",
                                     message = "You don't have permission to view this character",
                                     timestamp = Clock.System.now().toString()
@@ -184,7 +185,7 @@ fun Route.characterRoutes() {
                     } else {
                         call.respond(
                             HttpStatusCode.NotFound,
-                            ApiResponse.error(
+                            ApiResponse.error<Character>(
                                 code = "CHARACTER_NOT_FOUND",
                                 message = "Character not found",
                                 timestamp = Clock.System.now().toString()
@@ -194,7 +195,7 @@ fun Route.characterRoutes() {
                 } catch (e: Exception) {
                     call.respond(
                         HttpStatusCode.InternalServerError,
-                        ApiResponse.error(
+                        ApiResponse.error<Character>(
                             code = "INTERNAL_ERROR",
                             message = "Failed to fetch character: ${e.message}",
                             timestamp = Clock.System.now().toString()
@@ -207,7 +208,7 @@ fun Route.characterRoutes() {
             put {
                 val id = call.parameters["id"] ?: return@put call.respond(
                     HttpStatusCode.BadRequest,
-                    ApiResponse.error(
+                    ApiResponse.error<Character>(
                         code = "INVALID_ID",
                         message = "Character ID is required",
                         timestamp = Clock.System.now().toString()
@@ -221,7 +222,7 @@ fun Route.characterRoutes() {
                 if (userRole != "ADMIN") {
                     return@put call.respond(
                         HttpStatusCode.Forbidden,
-                        ApiResponse.error(
+                        ApiResponse.error<Character>(
                             code = "FORBIDDEN",
                             message = "Only admins can update characters",
                             timestamp = Clock.System.now().toString()
@@ -251,7 +252,7 @@ fun Route.characterRoutes() {
                     } else {
                         call.respond(
                             HttpStatusCode.NotFound,
-                            ApiResponse.error(
+                            ApiResponse.error<Character>(
                                 code = "CHARACTER_NOT_FOUND",
                                 message = "Character not found",
                                 timestamp = Clock.System.now().toString()
@@ -261,7 +262,7 @@ fun Route.characterRoutes() {
                 } catch (e: Exception) {
                     call.respond(
                         HttpStatusCode.InternalServerError,
-                        ApiResponse.error(
+                        ApiResponse.error<Character>(
                             code = "INTERNAL_ERROR",
                             message = "Failed to update character: ${e.message}",
                             timestamp = Clock.System.now().toString()
@@ -274,7 +275,7 @@ fun Route.characterRoutes() {
             delete {
                 val id = call.parameters["id"] ?: return@delete call.respond(
                     HttpStatusCode.BadRequest,
-                    ApiResponse.error(
+                    ApiResponse.error<Character>(
                         code = "INVALID_ID",
                         message = "Character ID is required",
                         timestamp = Clock.System.now().toString()
@@ -288,7 +289,7 @@ fun Route.characterRoutes() {
                 if (userRole != "ADMIN") {
                     return@delete call.respond(
                         HttpStatusCode.Forbidden,
-                        ApiResponse.error(
+                        ApiResponse.error<Character>(
                             code = "FORBIDDEN",
                             message = "Only admins can delete characters",
                             timestamp = Clock.System.now().toString()
@@ -308,7 +309,7 @@ fun Route.characterRoutes() {
                     } else {
                         call.respond(
                             HttpStatusCode.NotFound,
-                            ApiResponse.error(
+                            ApiResponse.error<Character>(
                                 code = "CHARACTER_NOT_FOUND",
                                 message = "Character not found",
                                 timestamp = Clock.System.now().toString()
@@ -318,7 +319,7 @@ fun Route.characterRoutes() {
                 } catch (e: Exception) {
                     call.respond(
                         HttpStatusCode.InternalServerError,
-                        ApiResponse.error(
+                        ApiResponse.error<Character>(
                             code = "INTERNAL_ERROR",
                             message = "Failed to delete character: ${e.message}",
                             timestamp = Clock.System.now().toString()

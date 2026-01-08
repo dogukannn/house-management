@@ -9,7 +9,7 @@ group = "com.dunettrpg.server"
 version = "0.1.0"
 
 application {
-    mainClass.set("com.dunettrpg.server.ApplicationKt")
+    mainClass.set("io.ktor.server.netty.EngineMain")
 }
 
 repositories {

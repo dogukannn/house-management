@@ -2,6 +2,7 @@ package com.dunettrpg.server.routes
 
 import com.dunettrpg.server.data.repository.HouseRepository
 import com.dunettrpg.server.domain.model.EconomyState
+import com.dunettrpg.server.domain.model.House
 import com.dunettrpg.server.dto.response.ApiResponse
 import io.ktor.http.*
 import io.ktor.server.application.*
@@ -39,7 +40,7 @@ fun Route.houseRoutes() {
                 } catch (e: Exception) {
                     call.respond(
                         HttpStatusCode.InternalServerError,
-                        ApiResponse.error(
+                        ApiResponse.error<House>(
                             code = "INTERNAL_ERROR",
                             message = "Failed to fetch houses: ${e.message}",
                             timestamp = Clock.System.now().toString()
@@ -52,7 +53,7 @@ fun Route.houseRoutes() {
             get("/{id}") {
                 val id = call.parameters["id"] ?: return@get call.respond(
                     HttpStatusCode.BadRequest,
-                    ApiResponse.error(
+                    ApiResponse.error<House>(
                         code = "INVALID_ID",
                         message = "House ID is required",
                         timestamp = Clock.System.now().toString()
@@ -77,7 +78,7 @@ fun Route.houseRoutes() {
                         } else {
                             call.respond(
                                 HttpStatusCode.Forbidden,
-                                ApiResponse.error(
+                                ApiResponse.error<House>(
                                     code = "FORBIDDEN",
                                     message = "You don't have permission to view this house",
                                     timestamp = Clock.System.now().toString()
@@ -87,7 +88,7 @@ fun Route.houseRoutes() {
                     } else {
                         call.respond(
                             HttpStatusCode.NotFound,
-                            ApiResponse.error(
+                            ApiResponse.error<House>(
                                 code = "HOUSE_NOT_FOUND",
                                 message = "House not found",
                                 timestamp = Clock.System.now().toString()
@@ -97,7 +98,7 @@ fun Route.houseRoutes() {
                 } catch (e: Exception) {
                     call.respond(
                         HttpStatusCode.InternalServerError,
-                        ApiResponse.error(
+                        ApiResponse.error<House>(
                             code = "INTERNAL_ERROR",
                             message = "Failed to fetch house: ${e.message}",
                             timestamp = Clock.System.now().toString()
@@ -110,7 +111,7 @@ fun Route.houseRoutes() {
             put("/{id}") {
                 val id = call.parameters["id"] ?: return@put call.respond(
                     HttpStatusCode.BadRequest,
-                    ApiResponse.error(
+                    ApiResponse.error<House>(
                         code = "INVALID_ID",
                         message = "House ID is required",
                         timestamp = Clock.System.now().toString()
@@ -124,7 +125,7 @@ fun Route.houseRoutes() {
                 if (userRole != "ADMIN") {
                     return@put call.respond(
                         HttpStatusCode.Forbidden,
-                        ApiResponse.error(
+                        ApiResponse.error<House>(
                             code = "FORBIDDEN",
                             message = "Only admins can update houses",
                             timestamp = Clock.System.now().toString()

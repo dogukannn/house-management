@@ -1,6 +1,7 @@
 package com.dunettrpg.server.routes
 
 import com.dunettrpg.server.data.repository.ArmyRepository
+import com.dunettrpg.server.domain.model.Army
 import com.dunettrpg.server.domain.model.ArmyStatus
 import com.dunettrpg.server.domain.model.ArmyUnits
 import com.dunettrpg.server.dto.response.ApiResponse
@@ -43,7 +44,7 @@ fun Route.armyRoutes() {
             get {
                 val houseId = call.parameters["houseId"] ?: return@get call.respond(
                     HttpStatusCode.BadRequest,
-                    ApiResponse.error(
+                    ApiResponse.error<Army>(
                         code = "INVALID_ID",
                         message = "House ID is required",
                         timestamp = Clock.System.now().toString()
@@ -66,7 +67,7 @@ fun Route.armyRoutes() {
                     } else {
                         call.respond(
                             HttpStatusCode.Forbidden,
-                            ApiResponse.error(
+                            ApiResponse.error<Army>(
                                 code = "FORBIDDEN",
                                 message = "You don't have permission to view these armies",
                                 timestamp = Clock.System.now().toString()
@@ -76,7 +77,7 @@ fun Route.armyRoutes() {
                 } catch (e: Exception) {
                     call.respond(
                         HttpStatusCode.InternalServerError,
-                        ApiResponse.error(
+                        ApiResponse.error<Army>(
                             code = "INTERNAL_ERROR",
                             message = "Failed to fetch armies: ${e.message}",
                             timestamp = Clock.System.now().toString()
@@ -89,7 +90,7 @@ fun Route.armyRoutes() {
             post {
                 val houseId = call.parameters["houseId"] ?: return@post call.respond(
                     HttpStatusCode.BadRequest,
-                    ApiResponse.error(
+                    ApiResponse.error<Army>(
                         code = "INVALID_ID",
                         message = "House ID is required",
                         timestamp = Clock.System.now().toString()
@@ -102,7 +103,7 @@ fun Route.armyRoutes() {
                 if (userRole != "ADMIN") {
                     return@post call.respond(
                         HttpStatusCode.Forbidden,
-                        ApiResponse.error(
+                        ApiResponse.error<Army>(
                             code = "FORBIDDEN",
                             message = "Only admins can create armies",
                             timestamp = Clock.System.now().toString()
@@ -132,7 +133,7 @@ fun Route.armyRoutes() {
                 } catch (e: Exception) {
                     call.respond(
                         HttpStatusCode.InternalServerError,
-                        ApiResponse.error(
+                        ApiResponse.error<Army>(
                             code = "INTERNAL_ERROR",
                             message = "Failed to create army: ${e.message}",
                             timestamp = Clock.System.now().toString()
@@ -147,7 +148,7 @@ fun Route.armyRoutes() {
             put {
                 val id = call.parameters["id"] ?: return@put call.respond(
                     HttpStatusCode.BadRequest,
-                    ApiResponse.error(
+                    ApiResponse.error<Army>(
                         code = "INVALID_ID",
                         message = "Army ID is required",
                         timestamp = Clock.System.now().toString()
@@ -160,7 +161,7 @@ fun Route.armyRoutes() {
                 if (userRole != "ADMIN") {
                     return@put call.respond(
                         HttpStatusCode.Forbidden,
-                        ApiResponse.error(
+                        ApiResponse.error<Army>(
                             code = "FORBIDDEN",
                             message = "Only admins can update armies",
                             timestamp = Clock.System.now().toString()
@@ -190,7 +191,7 @@ fun Route.armyRoutes() {
                     } else {
                         call.respond(
                             HttpStatusCode.NotFound,
-                            ApiResponse.error(
+                            ApiResponse.error<Army>(
                                 code = "ARMY_NOT_FOUND",
                                 message = "Army not found",
                                 timestamp = Clock.System.now().toString()
@@ -200,7 +201,7 @@ fun Route.armyRoutes() {
                 } catch (e: Exception) {
                     call.respond(
                         HttpStatusCode.InternalServerError,
-                        ApiResponse.error(
+                        ApiResponse.error<Army>(
                             code = "INTERNAL_ERROR",
                             message = "Failed to update army: ${e.message}",
                             timestamp = Clock.System.now().toString()
