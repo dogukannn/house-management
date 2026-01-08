@@ -1,6 +1,9 @@
 package com.dunettrpg.server.plugins
 
+import com.dunettrpg.server.routes.armyRoutes
 import com.dunettrpg.server.routes.authRoutes
+import com.dunettrpg.server.routes.characterRoutes
+import com.dunettrpg.server.routes.houseRoutes
 import io.ktor.server.application.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
@@ -16,5 +19,8 @@ fun Application.configureRouting() {
         }
         
         authRoutes()
+        houseRoutes()
+        characterRoutes()
+        armyRoutes()
     }
 }
