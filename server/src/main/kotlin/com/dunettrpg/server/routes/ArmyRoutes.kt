@@ -38,7 +38,7 @@ data class UpdateArmyRequest(
 fun Route.armyRoutes() {
     val armyRepository = ArmyRepository()
     
-    authenticate {
+    authenticate("auth-jwt") {
         route("/api/houses/{houseId}/armies") {
             // List house armies
             get {
