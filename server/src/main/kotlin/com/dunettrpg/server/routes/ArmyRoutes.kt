@@ -36,7 +36,7 @@ data class UpdateArmyRequest(
 )
 
 fun Route.armyRoutes() {
-    val armyRepository = ArmyRepository()
+    val armyRepository = ArmyRepository
     
     authenticate {
         route("/api/houses/{houseId}/armies") {

@@ -10,7 +10,7 @@ import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.transactions.transaction
 import java.util.UUID
 
-class CharacterRepository {
+object CharacterRepository {
     
     fun getCharactersByHouseId(houseId: String): List<Character> = transaction {
         CharactersTable.selectAll().where { CharactersTable.houseId eq UUID.fromString(houseId) }

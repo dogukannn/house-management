@@ -3,26 +3,29 @@ package com.dunettrpg.server.data.repository
 import com.dunettrpg.server.config.DatabaseConfig.dbQuery
 import com.dunettrpg.server.data.tables.UsersTable
 import com.dunettrpg.server.domain.model.User
+import com.dunettrpg.server.domain.model.UserRole
 import kotlinx.datetime.Clock
 import org.jetbrains.exposed.sql.*
+import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
+import org.jetbrains.exposed.sql.transactions.transaction
 import java.util.UUID
 
-class UserRepository {
+object UserRepository {
     
     suspend fun findByUsername(username: String): User? = dbQuery {
-        UsersTable.select { UsersTable.username eq username }
+        UsersTable.selectAll().where { UsersTable.username eq username }
             .mapNotNull { toUser(it) }
             .singleOrNull()
     }
     
     suspend fun findById(id: String): User? = dbQuery {
-        UsersTable.select { UsersTable.id eq UUID.fromString(id) }
+        UsersTable.selectAll().where { UsersTable.id eq UUID.fromString(id) }
             .mapNotNull { toUser(it) }
             .singleOrNull()
     }
     
     suspend fun getPasswordHash(username: String): String? = dbQuery {
-        UsersTable.select { UsersTable.username eq username }
+        UsersTable.selectAll().where { UsersTable.username eq username }
             .map { it[UsersTable.passwordHash] }
             .singleOrNull()
     }
@@ -52,12 +55,29 @@ class UserRepository {
         }
     }
     
+    suspend fun getAllUsers(): List<User> = dbQuery {
+        UsersTable.selectAll().map { toUser(it) }
+    }
+    
+    suspend fun createUser(username: String, passwordHash: String, role: UserRole, houseId: String?): User {
+        return create(username, passwordHash, role.name, houseId)!!
+    }
+    
+    fun deleteUser(userId: String): Boolean {
+        return org.jetbrains.exposed.sql.transactions.transaction {
+            UsersTable.deleteWhere { UsersTable.id eq UUID.fromString(userId) } > 0
+        }
+    }
+    
     private fun toUser(row: ResultRow): User {
         return User(
             id = row[UsersTable.id].toString(),
             username = row[UsersTable.username],
             role = row[UsersTable.role],
-            houseId = row[UsersTable.houseId]?.toString()
+            houseId = row[UsersTable.houseId]?.toString(),
+            fcmToken = row[UsersTable.fcmToken],
+            createdAt = row[UsersTable.createdAt].toString(),
+            lastActiveAt = row[UsersTable.lastActiveAt].toString()
         )
     }
 }

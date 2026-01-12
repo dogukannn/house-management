@@ -17,8 +17,7 @@ import io.ktor.server.routing.*
 import kotlinx.datetime.Clock
 
 fun Route.authRoutes() {
-    val authService = AuthService(UserRepository())
-    val userRepository = UserRepository()
+    val authService = AuthService(UserRepository)
     
     route("/api/auth") {
         post("/login") {
@@ -27,7 +26,7 @@ fun Route.authRoutes() {
             val result = authService.login(request.username, request.password)
             if (result != null) {
                 val (token, userId) = result
-                val user = userRepository.findById(userId)
+                val user = UserRepository.findById(userId)
                 
                 call.respond(
                     HttpStatusCode.OK,
