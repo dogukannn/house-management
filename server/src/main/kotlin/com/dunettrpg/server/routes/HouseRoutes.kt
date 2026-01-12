@@ -23,7 +23,7 @@ data class UpdateHouseRequest(
 )
 
 fun Route.houseRoutes() {
-    val houseRepository = HouseRepository()
+    val houseRepository = HouseRepository
     
     authenticate {
         route("/api/houses") {

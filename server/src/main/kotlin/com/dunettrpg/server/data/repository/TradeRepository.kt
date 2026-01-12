@@ -6,7 +6,6 @@ import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
-import org.jetbrains.exposed.sql.kotlin.datetime.kotlinx.datetime.Clock.System.now()
 import org.jetbrains.exposed.sql.transactions.transaction
 import java.util.*
 
@@ -59,9 +58,12 @@ object TradeRepository {
     }
     
     fun updateTradeStatus(tradeId: String, status: TradeStatus): TradeDeal? = transaction {
+        // Get current trade to check duration
+        val trade = getTradeById(tradeId)
+        
         TradeDealsTable.update({ TradeDealsTable.id eq UUID.fromString(tradeId) }) {
             it[TradeDealsTable.status] = status.name
-            if (status == TradeStatus.ACTIVE && get(TradeDealsTable.duration) != null) {
+            if (status == TradeStatus.ACTIVE && trade?.duration != null) {
                 // Set expiration if duration specified
                 it[expiresAt] = kotlinx.datetime.Clock.System.now()
             }
@@ -102,14 +104,14 @@ object TradeRepository {
             spiceReserves = fromHouse.economyState.spiceReserves - trade.offering.spice + trade.requesting.spice,
             solariBalance = fromHouse.economyState.solariBalance - trade.offering.solaris + trade.requesting.solaris
         )
-        HouseRepository.updateHouse(trade.fromHouseId, economyState = fromEconomy)
+        HouseRepository.updateHouse(trade.fromHouseId, null, null, fromEconomy, null)
         
         // Update to house (add offering, subtract requesting)
         val toEconomy = toHouse.economyState.copy(
             spiceReserves = toHouse.economyState.spiceReserves + trade.offering.spice - trade.requesting.spice,
             solariBalance = toHouse.economyState.solariBalance + trade.offering.solaris - trade.requesting.solaris
         )
-        HouseRepository.updateHouse(trade.toHouseId, economyState = toEconomy)
+        HouseRepository.updateHouse(trade.toHouseId, null, null, toEconomy, null)
     }
     
     private fun rowToTradeDeal(row: ResultRow): TradeDeal {

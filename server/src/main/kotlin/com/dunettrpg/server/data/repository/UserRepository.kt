@@ -6,6 +6,8 @@ import com.dunettrpg.server.domain.model.User
 import com.dunettrpg.server.domain.model.UserRole
 import kotlinx.datetime.Clock
 import org.jetbrains.exposed.sql.*
+import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
+import org.jetbrains.exposed.sql.transactions.transaction
 import java.util.UUID
 
 object UserRepository {
@@ -61,8 +63,10 @@ object UserRepository {
         return create(username, passwordHash, role.name, houseId)!!
     }
     
-    suspend fun deleteUser(userId: String): Boolean = dbQuery {
-        UsersTable.deleteWhere { id eq UUID.fromString(userId) } > 0
+    fun deleteUser(userId: String): Boolean {
+        return org.jetbrains.exposed.sql.transactions.transaction {
+            UsersTable.deleteWhere { UsersTable.id eq UUID.fromString(userId) } > 0
+        }
     }
     
     private fun toUser(row: ResultRow): User {

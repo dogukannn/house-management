@@ -10,7 +10,7 @@ import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.transactions.transaction
 import java.util.UUID
 
-class HouseRepository {
+object HouseRepository {
     
     fun getAllHouses(): List<House> = transaction {
         HousesTable.selectAll().map { rowToHouse(it) }

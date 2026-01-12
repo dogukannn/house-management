@@ -24,7 +24,7 @@ fun Route.adminRoutes() {
                 val role = principal?.payload?.getClaim("role")?.asString()
                 
                 if (role != "ADMIN") {
-                    call.respond(HttpStatusCode.Forbidden, ApiResponses.error("FORBIDDEN", "Admin access required"))
+                    call.respond(HttpStatusCode.Forbidden, ApiResponses.error<Unit>("FORBIDDEN", "Admin access required"))
                     finish()
                 }
             }
@@ -66,7 +66,7 @@ fun Route.adminRoutes() {
                 val request = try {
                     call.receive<AdjustEconomyRequest>()
                 } catch (e: Exception) {
-                    call.respond(HttpStatusCode.BadRequest, ApiResponses.error("INVALID_REQUEST", "Invalid request format"))
+                    call.respond(HttpStatusCode.BadRequest, ApiResponses.error<Unit>("INVALID_REQUEST", "Invalid request format"))
                     return@post
                 }
                 
@@ -78,7 +78,7 @@ fun Route.adminRoutes() {
                 )
                 
                 if (house == null) {
-                    call.respond(HttpStatusCode.NotFound, ApiResponses.error("NOT_FOUND", "House not found"))
+                    call.respond(HttpStatusCode.NotFound, ApiResponses.error<Unit>("NOT_FOUND", "House not found"))
                     return@post
                 }
                 
@@ -108,14 +108,14 @@ fun Route.adminRoutes() {
                 val request = try {
                     call.receive<CreateUserRequest>()
                 } catch (e: Exception) {
-                    call.respond(HttpStatusCode.BadRequest, ApiResponses.error("INVALID_REQUEST", "Invalid request format"))
+                    call.respond(HttpStatusCode.BadRequest, ApiResponses.error<Unit>("INVALID_REQUEST", "Invalid request format"))
                     return@post
                 }
                 
                 // Check if username already exists
                 val existingUser = UserRepository.findByUsername(request.username)
                 if (existingUser != null) {
-                    call.respond(HttpStatusCode.Conflict, ApiResponses.error("USERNAME_EXISTS", "Username already exists"))
+                    call.respond(HttpStatusCode.Conflict, ApiResponses.error<Unit>("USERNAME_EXISTS", "Username already exists"))
                     return@post
                 }
                 
@@ -123,13 +123,13 @@ fun Route.adminRoutes() {
                 if (request.houseId != null) {
                     val house = HouseRepository.getHouseById(request.houseId)
                     if (house == null) {
-                        call.respond(HttpStatusCode.BadRequest, ApiResponses.error("INVALID_HOUSE", "House not found"))
+                        call.respond(HttpStatusCode.BadRequest, ApiResponses.error<Unit>("INVALID_HOUSE", "House not found"))
                         return@post
                     }
                 }
                 
                 // Create user
-                val passwordHash = PasswordHasher.hashPassword(request.password)
+                val passwordHash = PasswordHasher.hash(request.password)
                 val user = UserRepository.createUser(
                     username = request.username,
                     passwordHash = passwordHash,
@@ -153,7 +153,7 @@ fun Route.adminRoutes() {
                 val request = try {
                     call.receive<AnnouncementRequest>()
                 } catch (e: Exception) {
-                    call.respond(HttpStatusCode.BadRequest, ApiResponses.error("INVALID_REQUEST", "Invalid request format"))
+                    call.respond(HttpStatusCode.BadRequest, ApiResponses.error<Unit>("INVALID_REQUEST", "Invalid request format"))
                     return@post
                 }
                 
@@ -174,13 +174,13 @@ fun Route.adminRoutes() {
             // DELETE /api/admin/users/{id} - Delete user (optional)
             delete("/users/{id}") {
                 val userId = call.parameters["id"] ?: run {
-                    call.respond(HttpStatusCode.BadRequest, ApiResponses.error("MISSING_ID", "User ID is required"))
+                    call.respond(HttpStatusCode.BadRequest, ApiResponses.error<Unit>("MISSING_ID", "User ID is required"))
                     return@delete
                 }
                 
                 val deleted = UserRepository.deleteUser(userId)
                 if (!deleted) {
-                    call.respond(HttpStatusCode.NotFound, ApiResponses.error("NOT_FOUND", "User not found"))
+                    call.respond(HttpStatusCode.NotFound, ApiResponses.error<Unit>("NOT_FOUND", "User not found"))
                     return@delete
                 }
                 
@@ -192,12 +192,12 @@ fun Route.adminRoutes() {
                 val request = try {
                     call.receive<ResetGameRequest>()
                 } catch (e: Exception) {
-                    call.respond(HttpStatusCode.BadRequest, ApiResponses.error("INVALID_REQUEST", "Invalid request format"))
+                    call.respond(HttpStatusCode.BadRequest, ApiResponses.error<Unit>("INVALID_REQUEST", "Invalid request format"))
                     return@post
                 }
                 
                 if (request.confirmationCode != "RESET_DUNE_GAME") {
-                    call.respond(HttpStatusCode.BadRequest, ApiResponses.error("INVALID_CONFIRMATION", "Invalid confirmation code"))
+                    call.respond(HttpStatusCode.BadRequest, ApiResponses.error<Unit>("INVALID_CONFIRMATION", "Invalid confirmation code"))
                     return@post
                 }
                 

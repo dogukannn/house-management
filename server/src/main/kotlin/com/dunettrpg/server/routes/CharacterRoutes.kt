@@ -36,7 +36,7 @@ data class UpdateCharacterRequest(
 )
 
 fun Route.characterRoutes() {
-    val characterRepository = CharacterRepository()
+    val characterRepository = CharacterRepository
     
     authenticate {
         route("/api/houses/{houseId}/characters") {

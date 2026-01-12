@@ -42,3 +42,22 @@ data class LoginResponse(
     val username: String,
     val role: String
 )
+
+// Utility object for cleaner API responses
+object ApiResponses {
+    fun <T> success(data: T): ApiResponse<T> {
+        return ApiResponse(
+            success = true,
+            data = data,
+            timestamp = kotlinx.datetime.Clock.System.now().toString()
+        )
+    }
+    
+    fun <T> error(code: String, message: String, details: Map<String, String>? = null): ApiResponse<T> {
+        return ApiResponse(
+            success = false,
+            error = ErrorResponse(code, message, details),
+            timestamp = kotlinx.datetime.Clock.System.now().toString()
+        )
+    }
+}

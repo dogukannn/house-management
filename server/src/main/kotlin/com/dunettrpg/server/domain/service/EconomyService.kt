@@ -63,7 +63,7 @@ object EconomyService {
         )
         
         // Update house
-        HouseRepository.updateHouse(house.id, economyState = newEconomyState)
+        HouseRepository.updateHouse(house.id, null, null, newEconomyState, null)
         
         return EconomyCycleResult(
             houseId = house.id,
@@ -158,7 +158,7 @@ object EconomyService {
             solariBalance = house.economyState.solariBalance + (solarisChange ?: 0.0)
         )
         
-        return HouseRepository.updateHouse(houseId, economyState = newEconomyState)
+        return HouseRepository.updateHouse(houseId, null, null, newEconomyState, null)
     }
 }
 

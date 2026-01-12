@@ -18,7 +18,7 @@ fun Route.tradeRoutes() {
             // GET /api/trades - List all trades or filter by status
             get {
                 val principal = call.principal<JWTPrincipal>() ?: run {
-                    call.respond(HttpStatusCode.Unauthorized, ApiResponses.error("UNAUTHORIZED", "Authentication required"))
+                    call.respond(HttpStatusCode.Unauthorized, ApiResponses.error<Unit>("UNAUTHORIZED", "Authentication required"))
                     return@get
                 }
                 
@@ -27,7 +27,7 @@ fun Route.tradeRoutes() {
                     try {
                         TradeRepository.getTradesByStatus(TradeStatus.valueOf(status.uppercase()))
                     } catch (e: IllegalArgumentException) {
-                        call.respond(HttpStatusCode.BadRequest, ApiResponses.error("INVALID_STATUS", "Invalid trade status"))
+                        call.respond(HttpStatusCode.BadRequest, ApiResponses.error<Unit>("INVALID_STATUS", "Invalid trade status"))
                         return@get
                     }
                 } else {
@@ -40,26 +40,26 @@ fun Route.tradeRoutes() {
             // POST /api/trades/propose - Propose a new trade
             post("/propose") {
                 val principal = call.principal<JWTPrincipal>() ?: run {
-                    call.respond(HttpStatusCode.Unauthorized, ApiResponses.error("UNAUTHORIZED", "Authentication required"))
+                    call.respond(HttpStatusCode.Unauthorized, ApiResponses.error<Unit>("UNAUTHORIZED", "Authentication required"))
                     return@post
                 }
                 
                 val houseId = principal.payload.getClaim("houseId").asString()
                 if (houseId == null) {
-                    call.respond(HttpStatusCode.BadRequest, ApiResponses.error("NO_HOUSE", "User is not associated with a house"))
+                    call.respond(HttpStatusCode.BadRequest, ApiResponses.error<Unit>("NO_HOUSE", "User is not associated with a house"))
                     return@post
                 }
                 
                 val request = try {
                     call.receive<ProposeTradeRequest>()
                 } catch (e: Exception) {
-                    call.respond(HttpStatusCode.BadRequest, ApiResponses.error("INVALID_REQUEST", "Invalid request format"))
+                    call.respond(HttpStatusCode.BadRequest, ApiResponses.error<Unit>("INVALID_REQUEST", "Invalid request format"))
                     return@post
                 }
                 
                 // Validate that the proposer is from the fromHouseId
                 if (request.fromHouseId != houseId) {
-                    call.respond(HttpStatusCode.Forbidden, ApiResponses.error("FORBIDDEN", "You can only propose trades from your own house"))
+                    call.respond(HttpStatusCode.Forbidden, ApiResponses.error<Unit>("FORBIDDEN", "You can only propose trades from your own house"))
                     return@post
                 }
                 
@@ -78,18 +78,18 @@ fun Route.tradeRoutes() {
             // GET /api/trades/{id} - Get trade details
             get("/{id}") {
                 val principal = call.principal<JWTPrincipal>() ?: run {
-                    call.respond(HttpStatusCode.Unauthorized, ApiResponses.error("UNAUTHORIZED", "Authentication required"))
+                    call.respond(HttpStatusCode.Unauthorized, ApiResponses.error<Unit>("UNAUTHORIZED", "Authentication required"))
                     return@get
                 }
                 
                 val tradeId = call.parameters["id"] ?: run {
-                    call.respond(HttpStatusCode.BadRequest, ApiResponses.error("MISSING_ID", "Trade ID is required"))
+                    call.respond(HttpStatusCode.BadRequest, ApiResponses.error<Unit>("MISSING_ID", "Trade ID is required"))
                     return@get
                 }
                 
                 val trade = TradeRepository.getTradeById(tradeId)
                 if (trade == null) {
-                    call.respond(HttpStatusCode.NotFound, ApiResponses.error("NOT_FOUND", "Trade not found"))
+                    call.respond(HttpStatusCode.NotFound, ApiResponses.error<Unit>("NOT_FOUND", "Trade not found"))
                     return@get
                 }
                 
@@ -97,7 +97,7 @@ fun Route.tradeRoutes() {
                 val role = principal.payload.getClaim("role").asString()
                 val houseId = principal.payload.getClaim("houseId").asString()
                 if (role != "ADMIN" && trade.fromHouseId != houseId && trade.toHouseId != houseId) {
-                    call.respond(HttpStatusCode.Forbidden, ApiResponses.error("FORBIDDEN", "You are not a party to this trade"))
+                    call.respond(HttpStatusCode.Forbidden, ApiResponses.error<Unit>("FORBIDDEN", "You are not a party to this trade"))
                     return@get
                 }
                 
@@ -107,36 +107,36 @@ fun Route.tradeRoutes() {
             // POST /api/trades/{id}/accept - Accept a trade
             post("/{id}/accept") {
                 val principal = call.principal<JWTPrincipal>() ?: run {
-                    call.respond(HttpStatusCode.Unauthorized, ApiResponses.error("UNAUTHORIZED", "Authentication required"))
+                    call.respond(HttpStatusCode.Unauthorized, ApiResponses.error<Unit>("UNAUTHORIZED", "Authentication required"))
                     return@post
                 }
                 
                 val tradeId = call.parameters["id"] ?: run {
-                    call.respond(HttpStatusCode.BadRequest, ApiResponses.error("MISSING_ID", "Trade ID is required"))
+                    call.respond(HttpStatusCode.BadRequest, ApiResponses.error<Unit>("MISSING_ID", "Trade ID is required"))
                     return@post
                 }
                 
                 val houseId = principal.payload.getClaim("houseId").asString()
                 if (houseId == null) {
-                    call.respond(HttpStatusCode.BadRequest, ApiResponses.error("NO_HOUSE", "User is not associated with a house"))
+                    call.respond(HttpStatusCode.BadRequest, ApiResponses.error<Unit>("NO_HOUSE", "User is not associated with a house"))
                     return@post
                 }
                 
                 val trade = TradeRepository.getTradeById(tradeId)
                 if (trade == null) {
-                    call.respond(HttpStatusCode.NotFound, ApiResponses.error("NOT_FOUND", "Trade not found"))
+                    call.respond(HttpStatusCode.NotFound, ApiResponses.error<Unit>("NOT_FOUND", "Trade not found"))
                     return@post
                 }
                 
                 // Only the receiving house can accept
                 if (trade.toHouseId != houseId) {
-                    call.respond(HttpStatusCode.Forbidden, ApiResponses.error("FORBIDDEN", "Only the receiving house can accept a trade"))
+                    call.respond(HttpStatusCode.Forbidden, ApiResponses.error<Unit>("FORBIDDEN", "Only the receiving house can accept a trade"))
                     return@post
                 }
                 
                 val acceptedTrade = TradeRepository.acceptTrade(tradeId)
                 if (acceptedTrade == null) {
-                    call.respond(HttpStatusCode.BadRequest, ApiResponses.error("CANNOT_ACCEPT", "Cannot accept trade - it may not be in PROPOSED status"))
+                    call.respond(HttpStatusCode.BadRequest, ApiResponses.error<Unit>("CANNOT_ACCEPT", "Cannot accept trade - it may not be in PROPOSED status"))
                     return@post
                 }
                 
@@ -146,30 +146,30 @@ fun Route.tradeRoutes() {
             // POST /api/trades/{id}/reject - Reject a trade
             post("/{id}/reject") {
                 val principal = call.principal<JWTPrincipal>() ?: run {
-                    call.respond(HttpStatusCode.Unauthorized, ApiResponses.error("UNAUTHORIZED", "Authentication required"))
+                    call.respond(HttpStatusCode.Unauthorized, ApiResponses.error<Unit>("UNAUTHORIZED", "Authentication required"))
                     return@post
                 }
                 
                 val tradeId = call.parameters["id"] ?: run {
-                    call.respond(HttpStatusCode.BadRequest, ApiResponses.error("MISSING_ID", "Trade ID is required"))
+                    call.respond(HttpStatusCode.BadRequest, ApiResponses.error<Unit>("MISSING_ID", "Trade ID is required"))
                     return@post
                 }
                 
                 val houseId = principal.payload.getClaim("houseId").asString()
                 if (houseId == null) {
-                    call.respond(HttpStatusCode.BadRequest, ApiResponses.error("NO_HOUSE", "User is not associated with a house"))
+                    call.respond(HttpStatusCode.BadRequest, ApiResponses.error<Unit>("NO_HOUSE", "User is not associated with a house"))
                     return@post
                 }
                 
                 val trade = TradeRepository.getTradeById(tradeId)
                 if (trade == null) {
-                    call.respond(HttpStatusCode.NotFound, ApiResponses.error("NOT_FOUND", "Trade not found"))
+                    call.respond(HttpStatusCode.NotFound, ApiResponses.error<Unit>("NOT_FOUND", "Trade not found"))
                     return@post
                 }
                 
                 // Only the receiving house can reject
                 if (trade.toHouseId != houseId) {
-                    call.respond(HttpStatusCode.Forbidden, ApiResponses.error("FORBIDDEN", "Only the receiving house can reject a trade"))
+                    call.respond(HttpStatusCode.Forbidden, ApiResponses.error<Unit>("FORBIDDEN", "Only the receiving house can reject a trade"))
                     return@post
                 }
                 
@@ -180,18 +180,18 @@ fun Route.tradeRoutes() {
             // POST /api/trades/{id}/cancel - Cancel a trade (proposer or admin)
             post("/{id}/cancel") {
                 val principal = call.principal<JWTPrincipal>() ?: run {
-                    call.respond(HttpStatusCode.Unauthorized, ApiResponses.error("UNAUTHORIZED", "Authentication required"))
+                    call.respond(HttpStatusCode.Unauthorized, ApiResponses.error<Unit>("UNAUTHORIZED", "Authentication required"))
                     return@post
                 }
                 
                 val tradeId = call.parameters["id"] ?: run {
-                    call.respond(HttpStatusCode.BadRequest, ApiResponses.error("MISSING_ID", "Trade ID is required"))
+                    call.respond(HttpStatusCode.BadRequest, ApiResponses.error<Unit>("MISSING_ID", "Trade ID is required"))
                     return@post
                 }
                 
                 val trade = TradeRepository.getTradeById(tradeId)
                 if (trade == null) {
-                    call.respond(HttpStatusCode.NotFound, ApiResponses.error("NOT_FOUND", "Trade not found"))
+                    call.respond(HttpStatusCode.NotFound, ApiResponses.error<Unit>("NOT_FOUND", "Trade not found"))
                     return@post
                 }
                 
@@ -200,7 +200,7 @@ fun Route.tradeRoutes() {
                 
                 // Only proposer or admin can cancel
                 if (role != "ADMIN" && trade.fromHouseId != houseId) {
-                    call.respond(HttpStatusCode.Forbidden, ApiResponses.error("FORBIDDEN", "Only the proposer or admin can cancel a trade"))
+                    call.respond(HttpStatusCode.Forbidden, ApiResponses.error<Unit>("FORBIDDEN", "Only the proposer or admin can cancel a trade"))
                     return@post
                 }
                 
@@ -211,37 +211,37 @@ fun Route.tradeRoutes() {
             // POST /api/trades/{id}/counter - Counter-propose (create new trade with modified terms)
             post("/{id}/counter") {
                 val principal = call.principal<JWTPrincipal>() ?: run {
-                    call.respond(HttpStatusCode.Unauthorized, ApiResponses.error("UNAUTHORIZED", "Authentication required"))
+                    call.respond(HttpStatusCode.Unauthorized, ApiResponses.error<Unit>("UNAUTHORIZED", "Authentication required"))
                     return@post
                 }
                 
                 val tradeId = call.parameters["id"] ?: run {
-                    call.respond(HttpStatusCode.BadRequest, ApiResponses.error("MISSING_ID", "Trade ID is required"))
+                    call.respond(HttpStatusCode.BadRequest, ApiResponses.error<Unit>("MISSING_ID", "Trade ID is required"))
                     return@post
                 }
                 
                 val houseId = principal.payload.getClaim("houseId").asString()
                 if (houseId == null) {
-                    call.respond(HttpStatusCode.BadRequest, ApiResponses.error("NO_HOUSE", "User is not associated with a house"))
+                    call.respond(HttpStatusCode.BadRequest, ApiResponses.error<Unit>("NO_HOUSE", "User is not associated with a house"))
                     return@post
                 }
                 
                 val originalTrade = TradeRepository.getTradeById(tradeId)
                 if (originalTrade == null) {
-                    call.respond(HttpStatusCode.NotFound, ApiResponses.error("NOT_FOUND", "Original trade not found"))
+                    call.respond(HttpStatusCode.NotFound, ApiResponses.error<Unit>("NOT_FOUND", "Original trade not found"))
                     return@post
                 }
                 
                 // Only the receiving house can counter
                 if (originalTrade.toHouseId != houseId) {
-                    call.respond(HttpStatusCode.Forbidden, ApiResponses.error("FORBIDDEN", "Only the receiving house can counter-propose"))
+                    call.respond(HttpStatusCode.Forbidden, ApiResponses.error<Unit>("FORBIDDEN", "Only the receiving house can counter-propose"))
                     return@post
                 }
                 
                 val request = try {
                     call.receive<CounterTradeRequest>()
                 } catch (e: Exception) {
-                    call.respond(HttpStatusCode.BadRequest, ApiResponses.error("INVALID_REQUEST", "Invalid request format"))
+                    call.respond(HttpStatusCode.BadRequest, ApiResponses.error<Unit>("INVALID_REQUEST", "Invalid request format"))
                     return@post
                 }
                 

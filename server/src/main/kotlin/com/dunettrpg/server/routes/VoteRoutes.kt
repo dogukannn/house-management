@@ -18,7 +18,7 @@ fun Route.voteRoutes() {
             // GET /api/votes - List all votes or filter by status
             get {
                 val principal = call.principal<JWTPrincipal>() ?: run {
-                    call.respond(HttpStatusCode.Unauthorized, ApiResponses.error("UNAUTHORIZED", "Authentication required"))
+                    call.respond(HttpStatusCode.Unauthorized, ApiResponses.error<Unit>("UNAUTHORIZED", "Authentication required"))
                     return@get
                 }
                 
@@ -27,7 +27,7 @@ fun Route.voteRoutes() {
                     try {
                         VoteRepository.getVotesByStatus(VoteStatus.valueOf(status.uppercase()))
                     } catch (e: IllegalArgumentException) {
-                        call.respond(HttpStatusCode.BadRequest, ApiResponses.error("INVALID_STATUS", "Invalid vote status"))
+                        call.respond(HttpStatusCode.BadRequest, ApiResponses.error<Unit>("INVALID_STATUS", "Invalid vote status"))
                         return@get
                     }
                 } else {
@@ -40,13 +40,13 @@ fun Route.voteRoutes() {
             // GET /api/votes/pending - Get pending votes for the authenticated user's house
             get("/pending") {
                 val principal = call.principal<JWTPrincipal>() ?: run {
-                    call.respond(HttpStatusCode.Unauthorized, ApiResponses.error("UNAUTHORIZED", "Authentication required"))
+                    call.respond(HttpStatusCode.Unauthorized, ApiResponses.error<Unit>("UNAUTHORIZED", "Authentication required"))
                     return@get
                 }
                 
                 val houseId = principal.payload.getClaim("houseId").asString()
                 if (houseId == null) {
-                    call.respond(HttpStatusCode.BadRequest, ApiResponses.error("NO_HOUSE", "User is not associated with a house"))
+                    call.respond(HttpStatusCode.BadRequest, ApiResponses.error<Unit>("NO_HOUSE", "User is not associated with a house"))
                     return@get
                 }
                 
@@ -57,7 +57,7 @@ fun Route.voteRoutes() {
             // POST /api/votes - Create a new vote (admin or house owner)
             post {
                 val principal = call.principal<JWTPrincipal>() ?: run {
-                    call.respond(HttpStatusCode.Unauthorized, ApiResponses.error("UNAUTHORIZED", "Authentication required"))
+                    call.respond(HttpStatusCode.Unauthorized, ApiResponses.error<Unit>("UNAUTHORIZED", "Authentication required"))
                     return@post
                 }
                 
@@ -68,13 +68,13 @@ fun Route.voteRoutes() {
                 val request = try {
                     call.receive<CreateVoteRequest>()
                 } catch (e: Exception) {
-                    call.respond(HttpStatusCode.BadRequest, ApiResponses.error("INVALID_REQUEST", "Invalid request format"))
+                    call.respond(HttpStatusCode.BadRequest, ApiResponses.error<Unit>("INVALID_REQUEST", "Invalid request format"))
                     return@post
                 }
                 
                 // Validate that user can create vote (must be admin or owner of initiator house)
                 if (role != "ADMIN" && userHouseId != request.initiatorHouseId) {
-                    call.respond(HttpStatusCode.Forbidden, ApiResponses.error("FORBIDDEN", "You can only create votes for your own house"))
+                    call.respond(HttpStatusCode.Forbidden, ApiResponses.error<Unit>("FORBIDDEN", "You can only create votes for your own house"))
                     return@post
                 }
                 
@@ -96,18 +96,18 @@ fun Route.voteRoutes() {
             // GET /api/votes/{id} - Get vote details
             get("/{id}") {
                 val principal = call.principal<JWTPrincipal>() ?: run {
-                    call.respond(HttpStatusCode.Unauthorized, ApiResponses.error("UNAUTHORIZED", "Authentication required"))
+                    call.respond(HttpStatusCode.Unauthorized, ApiResponses.error<Unit>("UNAUTHORIZED", "Authentication required"))
                     return@get
                 }
                 
                 val voteId = call.parameters["id"] ?: run {
-                    call.respond(HttpStatusCode.BadRequest, ApiResponses.error("MISSING_ID", "Vote ID is required"))
+                    call.respond(HttpStatusCode.BadRequest, ApiResponses.error<Unit>("MISSING_ID", "Vote ID is required"))
                     return@get
                 }
                 
                 val vote = VoteRepository.getVoteById(voteId)
                 if (vote == null) {
-                    call.respond(HttpStatusCode.NotFound, ApiResponses.error("NOT_FOUND", "Vote not found"))
+                    call.respond(HttpStatusCode.NotFound, ApiResponses.error<Unit>("NOT_FOUND", "Vote not found"))
                     return@get
                 }
                 
@@ -115,7 +115,7 @@ fun Route.voteRoutes() {
                 val role = principal.payload.getClaim("role").asString()
                 val houseId = principal.payload.getClaim("houseId").asString()
                 if (role != "ADMIN" && !vote.requiredParticipants.contains(houseId)) {
-                    call.respond(HttpStatusCode.Forbidden, ApiResponses.error("FORBIDDEN", "You are not a participant in this vote"))
+                    call.respond(HttpStatusCode.Forbidden, ApiResponses.error<Unit>("FORBIDDEN", "You are not a participant in this vote"))
                     return@get
                 }
                 
@@ -125,31 +125,31 @@ fun Route.voteRoutes() {
             // POST /api/votes/{id}/cast - Cast a vote
             post("/{id}/cast") {
                 val principal = call.principal<JWTPrincipal>() ?: run {
-                    call.respond(HttpStatusCode.Unauthorized, ApiResponses.error("UNAUTHORIZED", "Authentication required"))
+                    call.respond(HttpStatusCode.Unauthorized, ApiResponses.error<Unit>("UNAUTHORIZED", "Authentication required"))
                     return@post
                 }
                 
                 val voteId = call.parameters["id"] ?: run {
-                    call.respond(HttpStatusCode.BadRequest, ApiResponses.error("MISSING_ID", "Vote ID is required"))
+                    call.respond(HttpStatusCode.BadRequest, ApiResponses.error<Unit>("MISSING_ID", "Vote ID is required"))
                     return@post
                 }
                 
                 val houseId = principal.payload.getClaim("houseId").asString()
                 if (houseId == null) {
-                    call.respond(HttpStatusCode.BadRequest, ApiResponses.error("NO_HOUSE", "User is not associated with a house"))
+                    call.respond(HttpStatusCode.BadRequest, ApiResponses.error<Unit>("NO_HOUSE", "User is not associated with a house"))
                     return@post
                 }
                 
                 val request = try {
                     call.receive<CastVoteRequest>()
                 } catch (e: Exception) {
-                    call.respond(HttpStatusCode.BadRequest, ApiResponses.error("INVALID_REQUEST", "Invalid request format"))
+                    call.respond(HttpStatusCode.BadRequest, ApiResponses.error<Unit>("INVALID_REQUEST", "Invalid request format"))
                     return@post
                 }
                 
                 val vote = VoteRepository.castVote(voteId, houseId, request.decision)
                 if (vote == null) {
-                    call.respond(HttpStatusCode.BadRequest, ApiResponses.error("CANNOT_VOTE", "Cannot cast vote - vote may be closed or you are not a participant"))
+                    call.respond(HttpStatusCode.BadRequest, ApiResponses.error<Unit>("CANNOT_VOTE", "Cannot cast vote - vote may be closed or you are not a participant"))
                     return@post
                 }
                 
@@ -159,18 +159,18 @@ fun Route.voteRoutes() {
             // POST /api/votes/{id}/cancel - Cancel a vote (admin or initiator)
             post("/{id}/cancel") {
                 val principal = call.principal<JWTPrincipal>() ?: run {
-                    call.respond(HttpStatusCode.Unauthorized, ApiResponses.error("UNAUTHORIZED", "Authentication required"))
+                    call.respond(HttpStatusCode.Unauthorized, ApiResponses.error<Unit>("UNAUTHORIZED", "Authentication required"))
                     return@post
                 }
                 
                 val voteId = call.parameters["id"] ?: run {
-                    call.respond(HttpStatusCode.BadRequest, ApiResponses.error("MISSING_ID", "Vote ID is required"))
+                    call.respond(HttpStatusCode.BadRequest, ApiResponses.error<Unit>("MISSING_ID", "Vote ID is required"))
                     return@post
                 }
                 
                 val vote = VoteRepository.getVoteById(voteId)
                 if (vote == null) {
-                    call.respond(HttpStatusCode.NotFound, ApiResponses.error("NOT_FOUND", "Vote not found"))
+                    call.respond(HttpStatusCode.NotFound, ApiResponses.error<Unit>("NOT_FOUND", "Vote not found"))
                     return@post
                 }
                 
@@ -179,7 +179,7 @@ fun Route.voteRoutes() {
                 
                 // Only admin or initiator can cancel
                 if (role != "ADMIN" && vote.initiatorHouseId != houseId) {
-                    call.respond(HttpStatusCode.Forbidden, ApiResponses.error("FORBIDDEN", "Only admin or initiator can cancel a vote"))
+                    call.respond(HttpStatusCode.Forbidden, ApiResponses.error<Unit>("FORBIDDEN", "Only admin or initiator can cancel a vote"))
                     return@post
                 }
                 
