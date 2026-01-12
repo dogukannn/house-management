@@ -71,3 +71,69 @@ data class ArmyUnits(
 enum class ArmyStatus {
     STATIONED, DEPLOYED, IN_COMBAT, RETREATING
 }
+
+// Vote models
+@Serializable
+data class Vote(
+    val id: String,
+    val type: VoteType,
+    val title: String,
+    val description: String,
+    val initiatorHouseId: String,
+    val requiredParticipants: List<String>,
+    val votes: Map<String, VoteDecision>,
+    val consensusRequired: Boolean,
+    val deadline: String?,
+    val status: VoteStatus,
+    val result: String?,
+    val createdAt: String,
+    val resolvedAt: String?
+)
+
+@Serializable
+enum class VoteType {
+    TRADE_DEAL, ALLIANCE, WAR_DECLARATION, LANDSRAAD_MOTION, CUSTOM
+}
+
+@Serializable
+data class VoteDecision(
+    val decision: Decision,
+    val timestamp: String
+)
+
+@Serializable
+enum class Decision {
+    APPROVE, REJECT, ABSTAIN
+}
+
+@Serializable
+enum class VoteStatus {
+    PENDING, PASSED, FAILED, EXPIRED, CANCELLED
+}
+
+// Trade Deal models
+@Serializable
+data class TradeDeal(
+    val id: String,
+    val voteId: String?,
+    val fromHouseId: String,
+    val toHouseId: String,
+    val offering: TradeResources,
+    val requesting: TradeResources,
+    val duration: Int?,
+    val status: TradeStatus,
+    val createdAt: String,
+    val expiresAt: String?
+)
+
+@Serializable
+data class TradeResources(
+    val spice: Double = 0.0,
+    val solaris: Double = 0.0,
+    val other: List<String> = emptyList()
+)
+
+@Serializable
+enum class TradeStatus {
+    PROPOSED, ACTIVE, COMPLETED, CANCELLED, REJECTED
+}
