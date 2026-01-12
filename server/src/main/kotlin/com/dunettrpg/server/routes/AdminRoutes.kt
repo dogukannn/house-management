@@ -158,17 +158,18 @@ fun Route.adminRoutes() {
                 }
                 
                 // TODO: Implement actual notification broadcasting via FCM
-                // For now, just return success
+                // For now, just return acknowledgment that request was received
                 
                 val announcement = mapOf(
                     "title" to request.title,
                     "message" to request.message,
                     "priority" to request.priority,
-                    "sentAt" to kotlinx.datetime.Clock.System.now().toString(),
-                    "status" to "SENT"
+                    "receivedAt" to kotlinx.datetime.Clock.System.now().toString(),
+                    "status" to "QUEUED",
+                    "note" to "Notification system not yet implemented. This announcement was not sent."
                 )
                 
-                call.respond(HttpStatusCode.OK, ApiResponses.success(announcement))
+                call.respond(HttpStatusCode.Accepted, ApiResponses.success(announcement))
             }
             
             // DELETE /api/admin/users/{id} - Delete user (optional)

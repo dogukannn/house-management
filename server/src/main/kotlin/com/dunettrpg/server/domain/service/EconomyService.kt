@@ -103,7 +103,11 @@ object EconomyService {
         for (trade in trades.filter { it.status == TradeStatus.ACTIVE }) {
             // If this house is receiving, add the value
             if (trade.toHouseId == house.id) {
-                totalIncome += (trade.offering.solaris / (trade.duration ?: 1))
+                val duration = trade.duration ?: 1
+                // Protect against division by zero
+                if (duration > 0) {
+                    totalIncome += (trade.offering.solaris / duration)
+                }
             }
         }
         

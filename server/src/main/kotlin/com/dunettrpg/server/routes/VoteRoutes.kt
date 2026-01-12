@@ -78,7 +78,12 @@ fun Route.voteRoutes() {
                     return@post
                 }
                 
-                val deadline = request.deadline?.let { kotlinx.datetime.Instant.parse(it) }
+                val deadline = try {
+                    request.deadline?.let { kotlinx.datetime.Instant.parse(it) }
+                } catch (e: Exception) {
+                    call.respond(HttpStatusCode.BadRequest, ApiResponses.error<Unit>("INVALID_DATE", "Invalid deadline format. Use ISO-8601 format."))
+                    return@post
+                }
                 
                 val vote = VoteRepository.createVote(
                     type = request.type,
